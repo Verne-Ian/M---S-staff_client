@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "1020541347977",
+    "project_id": "auto-customer-care",
+    "storage_bucket": "auto-customer-care.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1020541347977:android:a2b7fac4ec0809f46ffe58",
+        "android_client_info": {
+          "package_name": "com.andy_n_special.auto_customer_care_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1020541347977-geba2ha72k5ltbb8aepdg4sv7sh5ub13.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.andy_n_special.auto_customer_care_app",
+            "certificate_hash": "591e38105a079483f9d8e2f1ea741a01375b9c38"
+          }
+        },
+        {
+          "client_id": "1020541347977-5ecsfdnhqrrq11se4trt783n9j303a0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA579CNtNHPT7o2i490nyLkF6WmYIQ-BSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1020541347977-5ecsfdnhqrrq11se4trt783n9j303a0v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1020541347977-7t6av41q8mal71g5j4oni9hmnkq504o9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.andynspecial.autoCustomerCareApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1020541347977:android:03b1ec487ad316b36ffe58",
+        "android_client_info": {
+          "package_name": "com.example.m_n_s_staff_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1020541347977-5ecsfdnhqrrq11se4trt783n9j303a0v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA579CNtNHPT7o2i490nyLkF6WmYIQ-BSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1020541347977-5ecsfdnhqrrq11se4trt783n9j303a0v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1020541347977-7t6av41q8mal71g5j4oni9hmnkq504o9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.andynspecial.autoCustomerCareApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
