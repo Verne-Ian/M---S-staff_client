@@ -95,7 +95,7 @@ TextFormField otherField(String text, IconData icon, bool isPassword,
           gapPadding: 1.0,
           borderRadius: BorderRadius.circular(20.0),
           borderSide: BorderSide(
-              color: Colors.blue.withOpacity(0.9),
+              color: Colors.green.withOpacity(0.9),
               style: BorderStyle.solid,
               width: 3)),
       floatingLabelBehavior: FloatingLabelBehavior.auto,
@@ -107,7 +107,7 @@ TextFormField otherField(String text, IconData icon, bool isPassword,
           borderSide: BorderSide(
               width: 3,
               style: BorderStyle.solid,
-              color: Colors.blue.withOpacity(0.9))),
+              color: Colors.green.withOpacity(0.9))),
     ),
     keyboardType:
         isPassword ? TextInputType.visiblePassword : TextInputType.emailAddress,
@@ -185,7 +185,7 @@ Container loginSignUpButton(
             if (states.contains(MaterialState.pressed)) {
               return Colors.blueGrey;
             }
-            return Colors.blue.shade600;
+            return Colors.green;
           }),
           shape: MaterialStateProperty.all(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)))),
@@ -247,7 +247,7 @@ Container GoogleSignUpButton(
             if (states.contains(MaterialState.pressed)) {
               return Colors.blueGrey;
             }
-            return Colors.lightBlue;
+            return Colors.green;
           }),
           shape: MaterialStateProperty.all(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)))),

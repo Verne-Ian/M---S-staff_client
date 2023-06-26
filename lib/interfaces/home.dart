@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:m_n_s_staff_client/addons/drawer.dart';
 import 'package:m_n_s_staff_client/interfaces/doctorsHome.dart';
+import 'package:m_n_s_staff_client/interfaces/requestApproverHome.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -17,13 +18,14 @@ class _MyHomePageState extends State<MyHomePage> {
   late String? name = user!.displayName;
   late String? userId = user!.uid;
   late String? role;
+  late String appBar = widget.title;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const MainSideBar(),
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(appBar),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -44,7 +46,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               ],
             );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: Card(
                 elevation: 10,
@@ -52,8 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('Loading'),
               ),
             );
-          } else if (snapshot.hasError) {
+          }
+          if (snapshot.hasError) {
             print(snapshot.error);
+            return Text('Error: ${snapshot.error}');
           }
 
           var redirectData =
@@ -62,9 +67,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
           switch (role) {
             case 'Doctor':
+                appBar = 'Hello Doc';
               return const DocHome();
             case 'Staff':
-              return const MyHomePage(title: 'Staff');
+              return const RequestApproving();
             default:
               // Handle unknown role or other cases
               return const SizedBox();

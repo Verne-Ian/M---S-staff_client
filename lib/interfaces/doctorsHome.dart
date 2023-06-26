@@ -22,9 +22,6 @@ class _DocHomeState extends State<DocHome> {
     ImageProvider? userPic;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome Doc'),
-      ),
       backgroundColor: Colors.white,
       body: StreamBuilder<QuerySnapshot>(
         stream: AllServices.lastChatRoom(senderId, senderName),
