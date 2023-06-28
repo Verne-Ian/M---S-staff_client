@@ -22,6 +22,9 @@ class _DocHomeState extends State<DocHome> {
     ImageProvider? userPic;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Patient Chat'),
+      ),
       backgroundColor: Colors.white,
       body: StreamBuilder<QuerySnapshot>(
         stream: AllServices.lastChatRoom(senderId, senderName),
@@ -90,7 +93,7 @@ class _DocHomeState extends State<DocHome> {
                       messageText = 'Document';
                     }
                     return StreamBuilder<QuerySnapshot>(
-                        stream: AllServices.streamUsers(receiverId),
+                        stream: AllServices.streamUser(receiverId),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             var userData = snapshot.data!.docs.last.data()

@@ -3,22 +3,18 @@ import 'package:flutter/material.dart';
 import '../addons/buttons&fields.dart';
 import '../services/MainServices.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class SignUp extends StatefulWidget {
+  const SignUp({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUp> createState() => _SignUpState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailControl = TextEditingController();
   TextEditingController passControl = TextEditingController();
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  TextEditingController userName = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +27,10 @@ class _LoginScreenState extends State<LoginScreen> {
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Center(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(w * 0.05, h * 0.1, w * 0.05, h * 0.0),
+            padding: EdgeInsets.fromLTRB(w * 0.05, h * 0.1, w * 0.03, h * 0.0),
             child: Container(
               constraints: BoxConstraints(
-                  maxWidth: w * 1.1, minWidth: w * 1.0, maxHeight: h * 1.0),
+                  maxWidth: w * 1.2, minWidth: w * 1.2, maxHeight: h * 1.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -50,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           child: Padding(
                             padding: EdgeInsets.only(
-                                left: w * 0.03, right: w * 0.03),
+                                left: w * 0.02, right: w * 0.02),
                             child: Form(
                               key: _formKey,
                               child: Column(
@@ -59,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     height: 25,
                                   ),
                                   Text(
-                                    "Login",
+                                    "Register",
                                     style: TextStyle(
                                         color: Colors.green.withOpacity(0.4),
                                         fontSize: w * 0.09,
@@ -68,7 +64,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   const SizedBox(
                                     height: 25,
                                   ),
-                                  otherField('Email', Icons.person, false,
+                                  defaultField('Enter you full name',
+                                      Icons.person, false, userName, ''),
+                                  const SizedBox(
+                                    height: 12.0,
+                                  ),
+                                  otherField('Email', Icons.email, false,
                                       emailControl),
                                   const SizedBox(
                                     height: 12.0,
@@ -80,9 +81,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   loginSignUpButton(context, true, () {
                                     if (_formKey.currentState!.validate()) {
-                                      Login.emailLogin(
+                                      Login.createWithEmail(
+                                          userName,
                                           emailControl,
                                           passControl,
+                                          userName.text,
                                           emailControl.text,
                                           passControl.text,
                                           context);
@@ -145,13 +148,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text('No Account?', style: TextStyle(color: Colors.black54)),
+        const Text('Have an Account?', style: TextStyle(color: Colors.black54)),
         GestureDetector(
           onTap: () {
-            Navigator.pushReplacementNamed(context, '/signup');
+            Navigator.pushReplacementNamed(context, '/login');
           },
           child: const Text(
-            'Register Now.',
+            'Login Instead.',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
         )

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -5,9 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:io';
-
-import 'package:image_picker/image_picker.dart';
+import 'package:universal_html/html.dart' as html;
 
 class Login {
   String userID;
@@ -94,9 +94,83 @@ class Login {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) {
-        if (FirebaseAuth.instance.currentUser!.photoURL != null) {
+        if (FirebaseAuth.instance.currentUser!.photoURL != null &&
+            FirebaseAuth.instance.currentUser!.displayName != null) {
+          Navigator.pop(context);
+        } else {
+          Navigator.pushReplacementNamed(context, '/addProfilePic');
+        }
+      });
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+
+      if (e.code == 'user-not-found') {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return const AlertDialog(
+                title: Text('User Not Found'),
+              );
+            });
+        emailControl.text = '';
+      } else if (e.code == 'wrong-password') {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return const AlertDialog(
+                title: Text('Wrong Password'),
+              );
+            });
+        passControl.text = '';
+      }
+    }
+  }
+
+  static Future<void> createWithEmail(
+      TextEditingController nameControl,
+      TextEditingController emailControl,
+      TextEditingController passControl,
+      String name,
+      String email,
+      String password,
+      BuildContext context) async {
+    try {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return const Center(
+              child: SpinKitDualRing(
+                color: Colors.white70,
+                size: 30.0,
+              ),
+            );
+          });
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) async {
+        final User? user = FirebaseAuth.instance.currentUser;
+
+        if (user != null) {
+          await user.updateDisplayName(name).then((value) async {
+            // Save additional user data to Firestore
+            await FirebaseFirestore.instance
+                .collection('Staff_Users')
+                .doc(user.uid)
+                .set({
+              'UserId': user.uid,
+              'Name': user.displayName,
+              'Email': user.email,
+              'ProfilePic': user.photoURL,
+              'Role': 'Staff'
+            });
+          });
+        }
+        if (FirebaseAuth.instance.currentUser!.photoURL != null &&
+            FirebaseAuth.instance.currentUser!.displayName != null) {
+          // ignore: use_build_context_synchronously
           return Navigator.pop(context);
         } else {
+          // ignore: use_build_context_synchronously
           Navigator.pushReplacementNamed(context, '/addProfilePic');
         }
       });
@@ -166,34 +240,41 @@ class MyUser {
 class AllServices {
   // Function for selecting or taking a profile picture
   static Future<String?> selectProfilePicture(
-      BuildContext context, File pickedFile) async {
-    File imageFile = File(pickedFile.path);
+      BuildContext context, html.File? pickedFile, String userName) async {
+    if (pickedFile == null) {
+      print('No image selected.');
+      return null;
+    }
+    final imageData = pickedFile;
 
-    // Upload image to Firebase Storage
     try {
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('profile_pics')
-          .child('${FirebaseAuth.instance.currentUser!.uid}.jpg');
+      final storageRef = FirebaseStorage.instance
+          .ref('profile_pics/${FirebaseAuth.instance.currentUser!.uid}.jpg');
 
-      await ref.putFile(imageFile);
+      final uploadTask = storageRef.putBlob(
+        imageData, // Cast to Blob type
+        SettableMetadata(contentType: imageData.type), // Set the content type
+      );
+
+      final snapshot = await uploadTask.whenComplete(() => null);
 
       // Get image URL from Firebase Storage
-      final url = await ref.getDownloadURL();
+      final url = await snapshot.ref.getDownloadURL();
 
       // Update user profile picture in Firebase Auth
-      await FirebaseAuth.instance.currentUser!.updatePhotoURL(url);
+      final user = FirebaseAuth.instance.currentUser!;
+      await user.updatePhotoURL(url.toString());
+      await user.updateDisplayName(userName);
 
       // Update user profile picture in Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({'profilePic': url}).then(
-              (value) => Navigator.pushReplacementNamed(context, '/home'));
+      final firestore = FirebaseFirestore.instance;
+      final userDocRef = firestore.collection('Staff_Users').doc(user.uid);
+      await userDocRef.update({'ProfilePic': url, 'Name': userName}).then(
+          (value) => Navigator.pushReplacementNamed(context, '/home'));
 
-      return url;
+      return url.toString();
     } catch (error) {
-      print(error);
+      print(error.toString());
     }
     return null;
   }
@@ -401,47 +482,47 @@ class AllServices {
     }
   }
 
-  static Future<String> uploadVideoMessage(String videoFilePath) async {
+  static Future<String> uploadVideoMessage(var videoFilePath) async {
     Reference storageReference = FirebaseStorage.instance
         .ref()
         .child('chat_videos')
         .child('${DateTime.now().millisecondsSinceEpoch}.mp4');
-    UploadTask uploadTask = storageReference.putFile(File(videoFilePath));
+    UploadTask uploadTask = storageReference.putFile(videoFilePath);
     await uploadTask.whenComplete(() {});
     String videoUrl = await storageReference.getDownloadURL();
     return videoUrl;
   }
 
   // Function for saving a document message to Firebase Storage
-  static Future<String> uploadDocumentMessage(String documentFilePath) async {
+  static Future<String> uploadDocumentMessage(var documentFilePath) async {
     Reference storageReference = FirebaseStorage.instance
         .ref()
         .child('document_messages')
         .child('${DateTime.now().millisecondsSinceEpoch}.pdf');
-    UploadTask uploadTask = storageReference.putFile(File(documentFilePath));
+    UploadTask uploadTask = storageReference.putFile(documentFilePath);
     await uploadTask.whenComplete(() {});
     String documentUrl = await storageReference.getDownloadURL();
     return documentUrl;
   }
 
-  static Future<String> uploadAudioMessage(String audioFilePath) async {
+  static Future<String> uploadAudioMessage(audioFilePath) async {
     Reference storageReference = FirebaseStorage.instance
         .ref()
         .child('audio_messages')
         .child('${DateTime.now().millisecondsSinceEpoch}.m4a');
-    UploadTask uploadTask = storageReference.putFile(File(audioFilePath));
+    UploadTask uploadTask = storageReference.putFile(audioFilePath);
     await uploadTask.whenComplete(() {});
     String audioUrl = await storageReference.getDownloadURL();
     return audioUrl;
   }
 
   // Function for saving an image message to Firebase Storage
-  static Future<String> uploadImageMessage(String imageFilePath) async {
+  static Future<String> uploadImageMessage(var imageFilePath) async {
     Reference storageReference = FirebaseStorage.instance
         .ref()
         .child('image_messages')
         .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
-    UploadTask uploadTask = storageReference.putFile(File(imageFilePath));
+    UploadTask uploadTask = storageReference.putFile(imageFilePath);
     await uploadTask.whenComplete(() {});
     String imageUrl = await storageReference.getDownloadURL();
     return imageUrl;
@@ -464,10 +545,10 @@ class AllServices {
 
   // Function to stream query snapshot of user data from Firestore
 
-  static Stream<QuerySnapshot> streamUsers(String? userId) {
+  static Stream<QuerySnapshot> streamUser(String? userId) {
     return FirebaseFirestore.instance
-        .collection('users')
-        .where('userId', isEqualTo: userId)
+        .collection('Staff_Users')
+        .where('UserId', isEqualTo: userId)
         .snapshots();
   }
 
@@ -560,41 +641,6 @@ class ChatProvider with ChangeNotifier {
   MyUser get currentUser => _currentUser;
   List<Message> get messages => _messages;
   FirebaseStorage get _storage => FirebaseStorage.instance;
-
-  Future<void> sendMessage(String text, XFile? image) async {
-    try {
-      final ref =
-          _storage.ref().child('ChatImages/${DateTime.now().toString()}');
-
-      late String? imageUrl;
-      if (image != null) {
-        if (kIsWeb) {
-          imageUrl = await ref
-              .putData(await image.readAsBytes())
-              .then((task) => task.ref.getDownloadURL());
-        } else {
-          imageUrl = await ref
-              .putFile(image as File)
-              .then((task) => task.ref.getDownloadURL());
-        }
-      } else {
-        imageUrl = null;
-      }
-
-      final message = Message(
-          id: '',
-          text: text,
-          imageUrl: imageUrl ?? '',
-          sender: _currentUser,
-          time: Timestamp.now());
-
-      await FirebaseFirestore.instance
-          .collection('messages')
-          .add(message.toMap());
-    } catch (error) {
-      print(error);
-    }
-  }
 
   void loadMessages() {
     _db.collection('messages').orderBy('time').snapshots().listen((snapshot) {

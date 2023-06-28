@@ -1,6 +1,6 @@
 {
-    "name": "m_n_s_staff_client",
-    "short_name": "m_n_s_staff_client",
+    "name": "M & S Staff",
+    "short_name": "M & S",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

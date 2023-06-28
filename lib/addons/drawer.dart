@@ -29,23 +29,9 @@ class _MainSideBarState extends State<MainSideBar> {
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Colors.black),
               currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.black54,
-                child: ClipOval(
-                    child: kIsWeb
-                        ? Image.network(
-                            '${FirebaseAuth.instance.currentUser!.photoURL}',
-                            scale: 1.0,
-                            fit: BoxFit.cover,
-                            width: 100,
-                            height: 70,
-                          )
-                        : Image.network(
-                            '${FirebaseAuth.instance.currentUser?.photoURL}',
-                            scale: 1.0,
-                            fit: BoxFit.cover,
-                            width: 100,
-                            height: 70,
-                          )),
+                foregroundImage: NetworkImage(
+                  '${FirebaseAuth.instance.currentUser?.photoURL}',
+                ),
               ),
               accountName:
                   Text('${FirebaseAuth.instance.currentUser?.displayName}'),
@@ -53,14 +39,15 @@ class _MainSideBarState extends State<MainSideBar> {
             ),
             ListTile(
               leading: const Icon(
-                Icons.feedback,
+                Icons.help_center_outlined,
                 size: 30.0,
               ),
               title: const Text(
                 'Support',
                 style: TextStyle(fontSize: 15.0),
               ),
-              onTap: () => launchUrl(telegramUrl),
+              onTap: () =>
+                  launchUrl(telegramUrl, mode: LaunchMode.externalApplication),
             ),
             ListTile(
                 leading: const Icon(
@@ -72,10 +59,11 @@ class _MainSideBarState extends State<MainSideBar> {
                   style: TextStyle(fontSize: 15.0),
                 ),
                 onTap: () {
-                  FirebaseAuth.instance.signOut();
+                  FirebaseAuth.instance.signOut().then((value) =>
+                      Navigator.pushReplacementNamed(context, '/login'));
                 }),
             ListTile(
-              leading: const Icon(Ionicons.close_circle, size: 30.0),
+              leading: const Icon(Ionicons.exit_outline, size: 30.0),
               title: const Text(
                 'Exit App',
                 style: TextStyle(fontSize: 15.0),

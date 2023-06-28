@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import '../interfaces/home.dart';
 import '../interfaces/login.dart';
 
-class Auth extends StatelessWidget {
+class Auth extends StatefulWidget {
   const Auth({Key? key}) : super(key: key);
 
+  @override
+  State<Auth> createState() => _AuthState();
+}
+
+class _AuthState extends State<Auth> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,9 +20,7 @@ class Auth extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return const MyHomePage(
-              title: 'Home',
-            );
+            return const MyHomePage();
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
