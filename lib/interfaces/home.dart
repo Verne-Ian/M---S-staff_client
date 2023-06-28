@@ -30,10 +30,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       drawer: const MainSideBar(),
       appBar: AppBar(
-        title: Text(appBar),
+        title: const Text('Hello, welcome to the staff portal.'),
       ),
       body: Padding(
-        padding: EdgeInsets.fromLTRB(w * 0.02, h * 0.01, w * 0.02, h * 0.0),
+        padding: EdgeInsets.fromLTRB(w * 0.02, h * 0.04, w * 0.02, h * 0.0),
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Staff_Users')
@@ -45,21 +45,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
-                    child: Card(
-                      elevation: 10,
-                      child: Padding(
-                        padding: EdgeInsets.all(h * 0.05),
-                        child: Row(
-                          children: [
-                            const Text('Opening your DashBoard'),
-                            const SizedBox(
-                              width: 15.0,
-                            ),
-                            SpinKitDualRing(
-                              color: Colors.green.shade600,
-                              size: 25.0,
-                            )
-                          ],
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          w * 0.05, h * 0.01, w * 0.05, h * 0.0),
+                      child: Card(
+                        elevation: 10,
+                        child: Padding(
+                          padding: EdgeInsets.all(h * 0.05),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Opening your DashBoard'),
+                              const SizedBox(
+                                width: 15.0,
+                              ),
+                              SpinKitDualRing(
+                                color: Colors.green.shade600,
+                                size: 25.0,
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -68,20 +73,35 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: Card(
-                  elevation: 10,
-                  margin: EdgeInsets.all(40.0),
-                  child: Row(
-                    children: [
-                      const Text('Connecting'),
-                      SpinKitDualRing(
-                        color: Colors.green.shade600,
-                        size: 25.0,
-                      )
-                    ],
-                  ),
-                ),
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          w * 0.05, h * 0.01, w * 0.05, h * 0.0),
+                      child: Card(
+                        elevation: 10,
+                        child: Padding(
+                          padding: EdgeInsets.all(h * 0.05),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Connecting'),
+                              const SizedBox(
+                                width: 15.0,
+                              ),
+                              SpinKitPianoWave(
+                                color: Colors.green.shade600,
+                                size: 25.0,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               );
             }
             if (snapshot.hasError) {
@@ -98,18 +118,72 @@ class _MyHomePageState extends State<MyHomePage> {
                 appBar = 'Hello Dr.${user!.displayName}';
                 return Column(
                   children: [
-                    ListTile(
-                      title: const Text('My Appointments'),
-                      subtitle: const Text('Manage Appointments'),
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const OldAppoint(where: 'Doctor'))),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OldAppoint(where: 'Doctor')));
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/schedule.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('My Appointments'),
+                            subtitle: const Text('Manage Appointments'),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OldAppoint(where: 'Doctor'))),
+                          ),
+                        ),
+                      ],
                     ),
-                    ListTile(
-                      title: const Text('Patient Interactions'),
-                      onTap: () => Navigator.pushNamed(context, '/docHome'),
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/docHome');
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/patient.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('Patient Interactions'),
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/docHome'),
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 );
@@ -118,18 +192,67 @@ class _MyHomePageState extends State<MyHomePage> {
                 appBar = 'Hello ${user!.displayName}';
                 return Column(
                   children: [
-                    ListTile(
-                      title: const Text('Appointments'),
-                      subtitle: const Text('Manage Appointments'),
-                      onTap: () =>
-                          Navigator.pushNamed(context, '/allAppointments'),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/allAppointments');
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/schedule.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('Appointments'),
+                            subtitle: const Text('Manage Appointments'),
+                            onTap: () => Navigator.pushNamed(
+                                context, '/allAppointments'),
+                          ),
+                        ),
+                      ],
                     ),
-                    ListTile(
-                      title: const Text('Ambulance'),
-                      subtitle: const Text('Manage Ambulance Requests'),
-                      onTap: () =>
-                          Navigator.pushNamed(context, '/ambieRequests'),
-                    )
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/ambieRequests');
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/ambulance.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('Ambulance'),
+                            subtitle: const Text('Manage Ambulance Requests'),
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/ambieRequests'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 );
               case 'Physician': //Case for when the receptionist log's in
@@ -137,18 +260,72 @@ class _MyHomePageState extends State<MyHomePage> {
                 appBar = 'Hello Dr.${user!.displayName}';
                 return Column(
                   children: [
-                    ListTile(
-                      title: const Text('My Appointments'),
-                      subtitle: const Text('Manage Appointments'),
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const OldAppoint(where: 'Doctor'))),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OldAppoint(where: 'Physician')));
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/schedule.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('My Appointments'),
+                            subtitle: const Text('Manage Appointments'),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OldAppoint(where: 'Physician'))),
+                          ),
+                        ),
+                      ],
                     ),
-                    ListTile(
-                      title: const Text('Patient Interactions'),
-                      onTap: () => Navigator.pushNamed(context, '/docHome'),
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/docHome');
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/patient.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('Patient Interactions'),
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/docHome'),
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 );
@@ -157,18 +334,72 @@ class _MyHomePageState extends State<MyHomePage> {
                 appBar = 'Hello Dr.${user!.displayName}';
                 return Column(
                   children: [
-                    ListTile(
-                      title: const Text('My Appointments'),
-                      subtitle: const Text('Manage Appointments'),
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const OldAppoint(where: 'Doctor'))),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OldAppoint(where: 'Dentist')));
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/schedule.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('My Appointments'),
+                            subtitle: const Text('Manage Appointments'),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OldAppoint(where: 'Dentist'))),
+                          ),
+                        ),
+                      ],
                     ),
-                    ListTile(
-                      title: const Text('Patient Interactions'),
-                      onTap: () => Navigator.pushNamed(context, '/docHome'),
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/docHome');
+                          },
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.15,
+                              width: MediaQuery.of(context).size.height * 0.15,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.white,
+                                image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/patient.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
+                        ),
+                        Expanded(
+                          child: ListTile(
+                            title: const Text('Patient Interactions'),
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/docHome'),
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 );
@@ -178,6 +409,13 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/allStaff');
+        },
+        tooltip: 'Chat with Staff',
+        child: const Icon(Icons.chat_bubble_outline_sharp),
       ),
     );
   }

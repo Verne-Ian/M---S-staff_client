@@ -61,7 +61,7 @@ class _AmbRequetsState extends State<AmbRequets> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ambulance Requests'),
+        title: const Text('Ambulance Requests'),
         centerTitle: true,
       ),
       body: Padding(

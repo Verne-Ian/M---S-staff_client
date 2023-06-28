@@ -1,11 +1,11 @@
-import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:universal_html/html.dart' as html;
 
 import '../addons/buttons&fields.dart';
 import '../services/MainServices.dart';
@@ -36,20 +36,22 @@ class _UserChatState extends State<UserChat> {
   bool recording = false;
   final User? user = FirebaseAuth.instance.currentUser;
   late String filePath;
-  File? _imageFile;
-  File? _mediaFile;
+  html.File? _imageFile;
+  html.File? _mediaFile;
+  late MemoryImage _memoryImage;
 
   // Function to select a video file
   Future<String?> selectVideoFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.video,
-        allowMultiple: false,
-      );
+      html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+      uploadInput.accept = 'video/*';
+      uploadInput.click();
 
-      if (result != null) {
-        PlatformFile file = result.files.first;
-        String? filePath = file.path;
+      await uploadInput.onChange.first;
+
+      if (uploadInput.files!.isNotEmpty) {
+        _mediaFile = uploadInput.files![0];
+        filePath = _mediaFile!.relativePath!;
         return filePath;
       } else {
         // User canceled the file picker
@@ -57,22 +59,22 @@ class _UserChatState extends State<UserChat> {
       }
     } catch (e) {
       // Handle any potential exceptions
-      print('Error selecting audio file: $e');
+      print('Error selecting video file: $e');
       return null;
     }
   }
 
-  // Function to select an audio file
   Future<String?> selectAudioFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.audio,
-        allowMultiple: false,
-      );
+      html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+      uploadInput.accept = 'audio/*';
+      uploadInput.click();
 
-      if (result != null) {
-        PlatformFile file = result.files.first;
-        String? filePath = file.path;
+      await uploadInput.onChange.first;
+
+      if (uploadInput.files!.isNotEmpty) {
+        _mediaFile = uploadInput.files![0];
+        filePath = _mediaFile!.relativePath!;
         return filePath;
       } else {
         // User canceled the file picker
@@ -85,51 +87,64 @@ class _UserChatState extends State<UserChat> {
     }
   }
 
-  Future<void> _selectImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
+  Future<void> _selectImage() async {
+    final input = html.FileUploadInputElement()..accept = 'image/*';
+    input.click();
 
-    setState(() {
-      if (pickedFile != null) {
-        setState(() {
-          _imageFile = File(pickedFile.path);
+    input.onChange.listen((event) {
+      final files = input.files;
+      if (files != null && files.isNotEmpty) {
+        final file = files[0];
+        final reader = html.FileReader();
+
+        reader.onLoadEnd.listen((event) {
+          setState(() {
+            final imageData = reader.result as String;
+            final bytes = base64Decode(imageData.split(',').last);
+            _memoryImage = Uint8List.fromList(bytes) as MemoryImage;
+            _imageFile = file;
+          });
         });
+
+        reader.readAsDataUrl(file);
       } else {
         print('No image selected.');
       }
     });
   }
 
-  // Function to call the showMenu function
-  Future showMenuCall() {
+  Future<void> showMenuCall() async {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
-    return showMenu(
+
+    final position = RelativeRect.fromLTRB(w * 0.4, h * 0.65, 1, 30);
+
+    final result = await showMenu(
       context: context,
-      position: RelativeRect.fromLTRB(w * 0.4, h * 0.65, 1, 30),
+      position: position,
       items: [
         PopupMenuItem(
           child: ListTile(
-            leading: Icon(Ionicons.videocam_outline),
+            leading: Icon(Icons.videocam_outlined),
             title: Text('Video'),
             onTap: () {
               selectVideoFile().then((value) {
                 if (value != null) {
                   setState(() {
                     filePath = value;
-                    _mediaFile = File(filePath);
                   });
                   AllServices.sendMessageToChatRoom(
-                      chatRoomId!,
-                      widget.senderId,
-                      widget.senderName,
-                      widget.receiverId,
-                      widget.receiverName,
-                      '',
-                      '',
-                      '',
-                      _mediaFile!.path,
-                      '');
+                    chatRoomId!,
+                    widget.senderId,
+                    widget.senderName,
+                    widget.receiverId,
+                    widget.receiverName,
+                    '',
+                    '',
+                    '',
+                    _mediaFile!.relativePath,
+                    '',
+                  );
                 }
               });
             },
@@ -138,19 +153,10 @@ class _UserChatState extends State<UserChat> {
         PopupMenuItem(
           child: ListTile(
             onTap: () {
-              _selectImage(ImageSource.gallery);
+              _selectImage();
             },
-            leading: Icon(Ionicons.image_outline),
+            leading: Icon(Icons.image_outlined),
             title: Text('Image'),
-          ),
-        ),
-        PopupMenuItem(
-          child: ListTile(
-            onTap: () {
-              _selectImage(ImageSource.camera);
-            },
-            leading: const Icon(Ionicons.camera_outline),
-            title: Text('Camera'),
           ),
         ),
         PopupMenuItem(
@@ -160,7 +166,6 @@ class _UserChatState extends State<UserChat> {
                 if (value != null) {
                   setState(() {
                     filePath = value;
-                    _mediaFile = File(filePath);
                   });
                   AllServices.sendMessageToChatRoom(
                       chatRoomId!,
@@ -169,19 +174,21 @@ class _UserChatState extends State<UserChat> {
                       widget.receiverId,
                       widget.receiverName,
                       '',
-                      _mediaFile!.path,
+                      _mediaFile!.relativePath,
                       '',
                       '',
                       '');
                 }
               });
             },
-            leading: const Icon(Ionicons.musical_notes_outline),
+            leading: const Icon(Icons.music_note_outlined),
             title: const Text('Audio'),
           ),
         ),
       ],
     );
+
+    return result;
   }
 
   participants() async {
@@ -234,7 +241,7 @@ class _UserChatState extends State<UserChat> {
         widget.receiverName,
         '',
         '',
-        _imageFile!.path,
+        _imageFile!.relativePath,
         '',
         '');
   }
@@ -378,7 +385,7 @@ class _UserChatState extends State<UserChat> {
                                 topRight: Radius.circular(10),
                                 bottomLeft: Radius.circular(10),
                                 bottomRight: Radius.circular(10))),
-                        child: Image.file(_imageFile!))
+                        child: Image.memory(_memoryImage as Uint8List))
                     : Container(),
                 SizedBox(
                   height: h * 0.01,
@@ -392,7 +399,7 @@ class _UserChatState extends State<UserChat> {
                             'Add Message',
                             false,
                             messageText,
-                            Icon(
+                            const Icon(
                               Icons.attach_file,
                             ),
                             showMenuCall)),
@@ -453,12 +460,12 @@ class _UserChatState extends State<UserChat> {
                               ),
                               onPressed: () {
                                 if (messageText.text.isEmpty &&
-                                    _imageFile!.path == null) {
+                                    _imageFile!.relativePath == null) {
                                   print("empty message");
                                 } else if (messageText.text.isNotEmpty) {
                                   sendMessage();
                                   messageText.clear();
-                                } else if (_imageFile!.path != null) {
+                                } else if (_imageFile!.relativePath != null) {
                                   sendImage();
                                   setState(() {
                                     _imageFile = null;

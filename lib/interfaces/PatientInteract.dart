@@ -43,8 +43,9 @@ class _DocHomeState extends State<DocHome> {
                 foregroundImage: AssetImage("assets/images/team_small.png"),
                 radius: 30.0,
               ),
-              title: const Text('Support Group'),
-              subtitle: const Text('Join and Interact with everyone at once'),
+              title: const Text('Discussion'),
+              subtitle:
+                  const Text('Join and Interact with all patients at once'),
               trailing:
                   ElevatedButton(onPressed: () {}, child: const Text('Join')),
             );

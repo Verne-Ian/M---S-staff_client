@@ -1,9 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:m_n_s_staff_client/interfaces/AddProfilePic.dart';
+import 'package:m_n_s_staff_client/interfaces/AllStaffChats.dart';
 import 'package:m_n_s_staff_client/interfaces/AmbulanceRequest.dart';
 import 'package:m_n_s_staff_client/interfaces/OldAppointments.dart';
-import 'package:m_n_s_staff_client/interfaces/doctorsHome.dart';
+import 'package:m_n_s_staff_client/interfaces/PatientInteract.dart';
 import 'package:m_n_s_staff_client/interfaces/home.dart';
 import 'package:m_n_s_staff_client/interfaces/login.dart';
 import 'package:m_n_s_staff_client/interfaces/signup.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUp(),
         '/ambieRequests': (context) => const AmbRequets(),
         '/docHome': (context) => const DocHome(),
+        '/allStaff': (context) => const AllStaff(),
       },
     );
   }
