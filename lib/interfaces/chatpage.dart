@@ -155,8 +155,8 @@ class _UserChatState extends State<UserChat> {
             onTap: () {
               _selectImage();
             },
-            leading: Icon(Icons.image_outlined),
-            title: Text('Image'),
+            leading: const Icon(Icons.image_outlined),
+            title: const Text('Image'),
           ),
         ),
         PopupMenuItem(
